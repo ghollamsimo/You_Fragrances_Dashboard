@@ -1,22 +1,15 @@
-"use client"
-
-import { useEffect } from "react"
-import Sidebar from "./components/ui/Sidebar"
 import Dashboard from "./pages/Dashboard.tsx";
-
+import {Navigate, Router, Routes, Route} from "react-router-dom";
+import Login from "./pages/auth/LoginAuthPage.tsx";
+import './App.css'
 function App() {
-    // Set dark mode by default
-    useEffect(() => {
-        document.documentElement.classList.add("dark")
-    }, [])
-
     return (
-        <div className="flex h-screen w-full bg-gray-950">
-            <Sidebar/>
-            <div className="flex-1 ml-64 overflow-auto">
-                <Dashboard />
-            </div>
-        </div>
+        <Routes>
+            <Route path="/" element={<Login/>}/>
+            <Route path="/dashboard" element={
+                    <Dashboard/>
+            }/>
+        </Routes>
     )
 }
 
