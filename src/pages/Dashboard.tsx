@@ -1,14 +1,45 @@
 import { PieChart, Search } from "lucide-react";
 import Sidebar from "../components/ui/Sidebar";
 import MetricCard from "../components/ui/MetricCard.tsx";
-import BestSaleCard from "../components/ui/BestSaleCard.tsx";
+import BestPerfumebyRating from "../components/ui/BestPerfumeByRatingUi.tsx";
 import CustomerList from "../components/ui/CustomerList.tsx";
 import GaugeChart from "../components/ui/GaugeChart.tsx";
 import RevenueChart from "../components/ui/RevenueChart.tsx";
 import OrderList from "../components/ui/OrderList.tsx";
 import ProductList from "../components/ui/ProductList.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../redux/Store.ts";
+import {useEffect, useState} from "react";
+import {bestPerfume, stats} from "../redux/slices/AuthSlice.ts";
 
 const Dashboard = () => {
+    const dispatch = useDispatch();
+    const stat = useSelector((state: RootState) => state.users.dataObj);
+    const bestPerfumeState = useSelector((state: RootState) => state.users.datalist);
+
+    useEffect(() => {
+        dispatch(stats());
+        dispatch(bestPerfume());
+    }, [dispatch]);
+
+    const usersCount = stat?.data?.length ? stat.data[0].users : 0;
+    const perfumesCount = stat?.data?.length ? stat.data[0].perfumes : 0;
+    const brandsCount = stat?.data?.length ? stat.data[0].brands : 0;
+
+    const prevData = { users: 1, perfumes: 1, brands: 1 };
+
+    const calculatePercentage = (current: number, previous: number) => {
+        if (previous === 0) return 100;
+        return Math.round(((current - previous) / previous) * 100);
+    };
+    if (!bestPerfumeState || bestPerfumeState.length === 0) {
+        return <p className="text-gray-400">No top-rated perfume found.</p>;
+    }
+
+    const sortedPerfumes = [...bestPerfumeState].sort((a, b) => b.averageRating - a.averageRating);
+
+    const bestPerfumeCard = sortedPerfumes[0];
+    const otherBestPerfumes = sortedPerfumes.slice(1);
     return (
         <div className="flex h-screen bg-gray-950 text-white">
             <Sidebar />
@@ -26,10 +57,31 @@ const Dashboard = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <MetricCard title="Users" value="320" percentage={75} color="#3b82f6" period="2 Month" />
-                    <MetricCard title="Perfumes" value="500" percentage={65} color="#3b82f6" period="1 Month" />
-                    <MetricCard title="Brands" value="20" percentage={35} color="#f59e0b" period="3 Month" />
-                    <BestSaleCard />
+                    <MetricCard
+                        title="Users"
+                        value={usersCount}
+                        percentage={calculatePercentage(usersCount, prevData.users)}
+                        color="#3b82f6"
+                    />
+                    <MetricCard
+                        title="Perfumes"
+                        value={perfumesCount}
+                        percentage={calculatePercentage(perfumesCount, prevData.perfumes)}
+                        color="#3b82f6"
+                    />
+                    <MetricCard
+                        title="Brands"
+                        value={brandsCount}
+                        percentage={calculatePercentage(brandsCount, prevData.brands)}
+                        color="#f59e0b"
+                    />
+                    <BestPerfumebyRating
+                        name={bestPerfumeCard.name}
+                        image={bestPerfumeCard.image}
+                        brand={bestPerfumeCard.brand}
+                        averageRating={bestPerfumeCard.averageRating}
+                        otherPerfumes={otherBestPerfumes}
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">

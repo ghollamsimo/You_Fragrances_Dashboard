@@ -19,6 +19,16 @@ class AuthService {
     index(){
         return this.http.get('/users/index')
     }
+
+    async stats(){
+        const response = await this.http.get('/users/count')
+        return response.data
+    }
+    
+    async bestPerfume(){
+        const response = await this.http.get('/perfumes/bestPerfume')
+        return response.data
+    }
 }
 
 export default new AuthService()
