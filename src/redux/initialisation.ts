@@ -3,6 +3,7 @@ export const initialState = {
     datalist: [],
     dataObj: {},
     usersData:[],
+    perfumesData:[],
     errorMessage: null,
     token: null,
 };
