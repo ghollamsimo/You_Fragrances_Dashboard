@@ -33,26 +33,15 @@ export const bestPerfume = createAsyncThunk("users/bestPerfume", async (_) => {
         return error.response?.data || error.message || "Something went wrong.";
     }
 })
-// export const show = createAsyncThunk(
-//     "auth/show",
-//     async (id , {rejectWithValue}) => {
-//         try {
-//             const res = await AuthService.show(id)
-//             return res.data
-//         }catch (err) {
-//             return rejectWithValue(err.response?.data || err.message);
-//         }
-//     }
-// )
+
 
 export const indexUsers = createAsyncThunk(
-    "auth/indexUsers",
+    "users/index",
     async (_ , {rejectWithValue}) => {
         try {
-            const res = await AuthService.index()
-            return res.data
+            return await AuthService.index()
         }catch (err) {
-            return rejectWithValue(err.response?.data || err.message);
+            return rejectWithValue(err.response?.data || 'Something went wrong.');
         }
     }
 )
@@ -90,30 +79,19 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.errorMessage = action.payload || "login failed";
             })
-            // .addCase(show.pending, (state) => {
-            //     state.loading = true;
-            // })
-            // .addCase(show.fulfilled, (state, action: PayloadAction<any>) => {
-            //     state.loading = false;
-            //     state.dataObj = action.payload;
-            //     state.errorMessage = null;
-            // })
-            // .addCase(show.rejected, (state, action: PayloadAction<string | undefined>) => {
-            //     state.loading = false;
-            //     state.errorMessage = action.payload || "Login failed";
-            // })
+
             .addCase(indexUsers.pending, (state) => {
                 state.loading = true;
             })
             .addCase(indexUsers.fulfilled, (state, action: PayloadAction<any>) => {
                 state.loading = false;
-                state.datalist = action.payload;
+                state.usersData = action.payload;
                 state.errorMessage = null;
             })
-            // .addCase(indexUsers.rejected, (state, action: PayloadAction<string | undefined>) => {
-            //     state.loading = false;
-            //     state.errorMessage = action.payload || "index failed";
-            // })
+            .addCase(indexUsers.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.errorMessage = action.payload || "index failed";
+            })
         .addCase(stats.pending, (state) => {
             state.loading = true;
         })

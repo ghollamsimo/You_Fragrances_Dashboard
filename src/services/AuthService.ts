@@ -16,8 +16,9 @@ class AuthService {
         return this.http.get(`/users/show/${id}`)
     }
 
-    index(){
-        return this.http.get('/users/index')
+    async index(){
+        const response = await this.http.get('/users/index')
+        return response.data
     }
 
     async stats(){
