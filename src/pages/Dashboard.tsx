@@ -2,7 +2,6 @@ import { PieChart, Search } from "lucide-react";
 import Sidebar from "../components/ui/Sidebar";
 import MetricCard from "../components/ui/MetricCard.tsx";
 import BestPerfumebyRating from "../components/ui/BestPerfumeByRatingUi.tsx";
-import CustomerList from "../components/ui/CustomerList.tsx";
 import GaugeChart from "../components/ui/GaugeChart.tsx";
 import RevenueChart from "../components/ui/RevenueChart.tsx";
 import OrderList from "../components/ui/OrderList.tsx";
@@ -10,16 +9,18 @@ import ProductList from "../components/ui/ProductList.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/Store.ts";
 import {useEffect, useState} from "react";
-import {bestPerfume, stats} from "../redux/slices/AuthSlice.ts";
+import {bestPerfume, indexUsers, stats} from "../redux/slices/AuthSlice.ts";
+import ClientList from "../components/ui/ClientsListUi.tsx";
 
 const Dashboard = () => {
     const dispatch = useDispatch();
     const stat = useSelector((state: RootState) => state.users.dataObj);
     const bestPerfumeState = useSelector((state: RootState) => state.users.datalist);
-
+    const clients = useSelector((state: RootState) => state.users.usersData)
     useEffect(() => {
         dispatch(stats());
         dispatch(bestPerfume());
+        dispatch(indexUsers())
     }, [dispatch]);
 
     const usersCount = stat?.data?.length ? stat.data[0].users : 0;
@@ -88,7 +89,7 @@ const Dashboard = () => {
                     <div className="lg:col-span-2">
                         <RevenueChart />
                     </div>
-                    <CustomerList />
+                    <ClientList clients={clients} />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
