@@ -17,6 +17,22 @@ export const login = createAsyncThunk(
         }
     }
 );
+
+export const stats = createAsyncThunk("users/count", async (_) => {
+    try {
+        return await AuthService.stats()
+    }  catch (error) {
+        return error.response?.data || error.message || "Something went wrong.";
+    }
+})
+
+export const bestPerfume = createAsyncThunk("users/bestPerfume", async (_) => {
+    try {
+        return await AuthService.bestPerfume()
+    }  catch (error) {
+        return error.response?.data || error.message || "Something went wrong.";
+    }
+})
 // export const show = createAsyncThunk(
 //     "auth/show",
 //     async (id , {rejectWithValue}) => {
@@ -98,6 +114,30 @@ const authSlice = createSlice({
             //     state.loading = false;
             //     state.errorMessage = action.payload || "index failed";
             // })
+        .addCase(stats.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(stats.fulfilled, (state, action: PayloadAction<any>) => {
+            state.loading = false;
+            state.dataObj = action.payload;
+            state.errorMessage = null;
+        })
+        .addCase(stats.rejected, (state, action: PayloadAction<string | undefined>) => {
+            state.loading = false;
+            state.errorMessage = action.payload || "Getting stats failed";
+        })
+            .addCase(bestPerfume.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(bestPerfume.fulfilled, (state, action: PayloadAction<any>) => {
+                state.loading = false;
+                state.datalist = action.payload;
+                state.errorMessage = null;
+            })
+            .addCase(bestPerfume.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.errorMessage = action.payload || "Getting best Perfumes failed";
+            })
     }
 })
 
