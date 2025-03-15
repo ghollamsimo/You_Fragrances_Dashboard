@@ -1,11 +1,10 @@
 import { useState, ChangeEvent } from "react";
 
-// Define a TypeScript interface for the perfume data structure
 interface PerfumeData {
     name: string;
     image: string;
     brand: string;
-    topNotes: string[];
+    topNotes: string[]; // Array of selected ingredient names
     middleNotes: string[];
     baseNotes: string[];
     TargetAudience: string;
@@ -14,7 +13,6 @@ interface PerfumeData {
     sillage: string;
 }
 
-// Define the hook
 const usePerfumeForm = (initialData?: PerfumeData) => {
     const [perfumeData, setPerfumeData] = useState<PerfumeData>(
         initialData || {
@@ -31,7 +29,7 @@ const usePerfumeForm = (initialData?: PerfumeData) => {
         }
     );
 
-    // Handle input changes
+    // Handle text/select input changes
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setPerfumeData((prev) => ({
@@ -40,7 +38,20 @@ const usePerfumeForm = (initialData?: PerfumeData) => {
         }));
     };
 
-    // Reset the form
+    // Handle checkbox changes for notes
+    const handleNoteChange = (noteType: keyof Pick<PerfumeData, "topNotes" | "middleNotes" | "baseNotes">, ingredientName: string) => {
+        setPerfumeData((prev) => {
+            const currentNotes = prev[noteType];
+            if (currentNotes.includes(ingredientName)) {
+                // Remove if already selected
+                return { ...prev, [noteType]: currentNotes.filter((name) => name !== ingredientName) };
+            } else {
+                // Add if not selected
+                return { ...prev, [noteType]: [...currentNotes, ingredientName] };
+            }
+        });
+    };
+
     const resetForm = () => {
         setPerfumeData({
             name: "",
@@ -56,7 +67,7 @@ const usePerfumeForm = (initialData?: PerfumeData) => {
         });
     };
 
-    return { perfumeData, setPerfumeData, handleChange, resetForm };
+    return { perfumeData, setPerfumeData, handleChange, handleNoteChange, resetForm };
 };
 
 export default usePerfumeForm;

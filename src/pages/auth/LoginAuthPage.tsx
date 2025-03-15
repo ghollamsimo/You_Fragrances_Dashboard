@@ -68,7 +68,7 @@ const Login: React.FC = () => {
 
     return (
         <main className="flex w-full h-screen flex-col md:flex-row">
-            <div className="overflow-y-hidden text-black w-full md:w-[35rem]">
+            <div className="overflow-y-hidden bg-white text-black w-full md:w-[35rem]">
                 <div className="flex m-3 justify-between">
                     <h1 className="font-extrabold text-lg">You Fragrances</h1>
                     <div className="underline cursor-pointer">Go to Login</div>

@@ -4,6 +4,8 @@ export const initialState = {
     dataObj: {},
     usersData:[],
     perfumesData:[],
+    notesData:[],
+    brandsData:[],
     errorMessage: null,
     token: null,
 };

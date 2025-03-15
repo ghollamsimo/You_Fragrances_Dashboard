@@ -28,6 +28,7 @@ class AuthService {
     
     async bestPerfume(){
         const response = await this.http.get('/perfumes/bestPerfume')
+        console.log('heelollll', response.data)
         return response.data
     }
 }

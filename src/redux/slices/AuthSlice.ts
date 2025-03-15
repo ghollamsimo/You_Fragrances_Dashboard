@@ -110,6 +110,7 @@ const authSlice = createSlice({
             .addCase(bestPerfume.fulfilled, (state, action: PayloadAction<any>) => {
                 state.loading = false;
                 state.datalist = action.payload;
+                console.log('helloi', action.payload)
                 state.errorMessage = null;
             })
             .addCase(bestPerfume.rejected, (state, action: PayloadAction<string | undefined>) => {

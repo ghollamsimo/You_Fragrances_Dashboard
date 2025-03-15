@@ -1,6 +1,5 @@
 const DeleteModalComponent = ({ isOpen, onClose, onConfirm, title, message }) => {
     if (!isOpen) return null;
-
     return (
         <>
 

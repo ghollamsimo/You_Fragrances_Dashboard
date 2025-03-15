@@ -8,13 +8,10 @@ import {
 const Sidebar = () => {
     const navItems = [
         { icon: <Home size={20} />, label: "Home", active: true },
-        { icon: <BarChart2 size={20} />, label: "Analytics", active: false },
-        { icon: <Users size={20} />, label: "Users", active: false, hasDropdown: true },
-        { icon: <User size={20} />, label: "User Profile", active: false, hasDropdown: true },
     ]
 
     return (
-        <div className="fixed left-0 top-0 h-screen w-64 bg-transparent border-r-2 border-gray-700 text-white flex flex-col z-10">
+        <div className="fixed left-0 top-0 h-screen w-52 bg-transparent border-r-2 border-gray-700 text-white flex flex-col z-10">
             <div className="p-6">
                 <div className="flex items-center justify-center">
                     <div className="grid grid-cols-2 gap-1">

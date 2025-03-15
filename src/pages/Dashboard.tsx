@@ -2,35 +2,54 @@ import { PieChart, Search } from "lucide-react";
 import Sidebar from "../components/ui/Sidebar";
 import MetricCard from "../components/ui/MetricCard.tsx";
 import BestPerfumebyRating from "../components/ui/BestPerfumeByRatingUi.tsx";
-import GaugeChart from "../components/ui/GaugeChart.tsx";
 import OrderList from "../components/ui/OrderList.tsx";
 import ProductList from "../components/ui/ProductList.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../redux/Store.ts";
+import {AppDispatch, RootState} from "../redux/Store.ts";
 import {useEffect} from "react";
 import {bestPerfume, indexUsers, stats} from "../redux/slices/AuthSlice.ts";
 import ClientList from "../components/ui/ClientsListUi.tsx";
 import PerfumeTable from "../components/ui/PerfumesListUi.tsx";
 import {allPerfumes, destroy} from "../redux/slices/PerfumeSlice.ts";
+import {allIngredients} from "../redux/slices/IngredientSlice.ts";
+import {allBrands, destroyBrand, storeBrand, updateBrand} from "../redux/slices/BrandSlice.ts";
 
 const Dashboard = () => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const stat = useSelector((state: RootState) => state.users.dataObj);
     const bestPerfumeState = useSelector((state: RootState) => state.users.datalist);
     const clients = useSelector((state: RootState) => state.users.usersData)
     const perfumes = useSelector((state: RootState) => state.perfumes.perfumesData)
+    const notes = useSelector((state: RootState) => state.ingredients.notesData)
+    const brands = useSelector((state: RootState) => state.brands.brandsData || []);
 
     const deletePerfume = async (id: string) => {
-        await dispatch(destroy(id))
-        dispatch(allPerfumes())
+        await dispatch(destroy(id));
+        dispatch(allPerfumes());
         dispatch(stats());
+    };
 
+    const deleteBrand = async (id: string) => {
+        await dispatch(destroyBrand(id));
+        dispatch(allBrands());
+        dispatch(stats());
+    };
+    const saveBrand = async (data) =>{
+        await dispatch(storeBrand(data))
+        dispatch(allBrands());
+        dispatch(stats());
+    }
+    const modifyBrand = async (id,data) =>{
+        await dispatch(updateBrand({id, data}))
+        dispatch(allBrands());
     }
     useEffect(() => {
         dispatch(stats());
         dispatch(bestPerfume());
         dispatch(indexUsers())
         dispatch(allPerfumes())
+        dispatch(allIngredients())
+        dispatch(allBrands())
     }, [dispatch]);
 
     const usersCount = stat?.data?.length ? stat.data[0].users : 0;
@@ -87,10 +106,10 @@ const Dashboard = () => {
                         color="#f59e0b"
                     />
                     <BestPerfumebyRating
-                        name={bestPerfumeCard.name}
-                        image={bestPerfumeCard.image}
-                        brand={bestPerfumeCard.brand}
-                        averageRating={bestPerfumeCard.averageRating}
+                        name={bestPerfumeCard?.name}
+                        image={bestPerfumeCard?.image}
+                        brand={bestPerfumeCard?.brand}
+                        averageRating={bestPerfumeCard?.averageRating}
                         otherPerfumes={otherBestPerfumes}
                     />
                 </div>
@@ -102,15 +121,12 @@ const Dashboard = () => {
                     <ClientList clients={clients} />
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                     <div>
-                        <GaugeChart percentage={70} title="Profit Increase" />
+                        <OrderList ingredients={notes}/>
                     </div>
                     <div>
-                        <OrderList />
-                    </div>
-                    <div>
-                        <ProductList />
+                        <ProductList updateBrand={modifyBrand} onDeleteBrand={deleteBrand} brandsData={brands} onSave={saveBrand}/>
                     </div>
                 </div>
 
