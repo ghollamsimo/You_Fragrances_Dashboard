@@ -23,7 +23,7 @@ const ProductList = ({updateBrand, onSave, brandsData = [], onDeleteBrand }) => 
     };
 
     const handleUpdateClick = (brand) => {
-        console.log(brand); // Ensure `brand._id` is valid
+        console.log(brand);
         setSelectedBrand(brand);
         setUpdateModal(true);
     };

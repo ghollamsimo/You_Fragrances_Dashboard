@@ -25,6 +25,18 @@ export const addMultipleIngredients = createAsyncThunk(
     }
 )
 
+export const destroyIngredient = createAsyncThunk(
+    "notes/delete",
+    async (id: string, {rejectWithValue}) => {
+        try {
+            return await IngredientService.delete(id)
+        }catch (err) {
+            return rejectWithValue(err.response?.data || 'Something went wrong.');
+        }
+    }
+)
+
+
 const ingredientSlice = createSlice({
     name: 'ingredients',
     initialState,
@@ -64,6 +76,18 @@ const ingredientSlice = createSlice({
                 state.errorMessage = null;
             })
             .addCase(addMultipleIngredients.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.errorMessage = action.payload || "index failed";
+            })
+            .addCase(destroyIngredient.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(destroyIngredient.fulfilled, (state, action: PayloadAction<any>) => {
+                state.loading = false;
+                state.notesData = action.payload;
+                state.errorMessage = null;
+            })
+            .addCase(destroyIngredient.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.errorMessage = action.payload || "index failed";
             })

@@ -23,6 +23,27 @@ export const destroy = createAsyncThunk(
         }
     }
 )
+
+export const storingPerfume = createAsyncThunk(
+    "perfumes/store",
+    async (data: any , {rejectWithValue}) => {
+        try {
+            return await PerfumeService.store(data)
+        }catch (err) {
+            return rejectWithValue(err.response?.data || 'Something went wrong.');
+        }
+    }
+)
+export const updatePerfume = createAsyncThunk(
+    "perfumes/update",
+    async ({id, data} , {rejectWithValue}) => {
+        try {
+            return await PerfumeService.update(id,data)
+        }catch (err) {
+            return rejectWithValue(err.response?.data || 'Something went wrong.');
+        }
+    }
+)
 const perfumeSlice = createSlice({
     name: 'perfumes',
     initialState,
@@ -66,6 +87,32 @@ const perfumeSlice = createSlice({
             .addCase(destroy.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.errorMessage = action.payload || "delete failed";
+            })
+            .addCase(storingPerfume.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(storingPerfume.fulfilled, (state, action: PayloadAction<any>) => {
+                state.loading = false;
+                state.perfumesData = action.payload;
+                // console.log('wach jat data ? :', action.payload)
+                state.errorMessage = null;
+            })
+            .addCase(storingPerfume.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.errorMessage = action.payload || "store failed";
+            })
+            .addCase(updatePerfume.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updatePerfume.fulfilled, (state, action: PayloadAction<any>) => {
+                state.loading = false;
+                state.perfumesData = action.payload;
+                // console.log('wach jat data ? :', action.payload)
+                state.errorMessage = null;
+            })
+            .addCase(updatePerfume.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.loading = false;
+                state.errorMessage = action.payload || "store failed";
             })
     }
 })

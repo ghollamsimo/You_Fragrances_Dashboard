@@ -10,8 +10,8 @@ import {useEffect} from "react";
 import {bestPerfume, indexUsers, stats} from "../redux/slices/AuthSlice.ts";
 import ClientList from "../components/ui/ClientsListUi.tsx";
 import PerfumeTable from "../components/ui/PerfumesListUi.tsx";
-import {allPerfumes, destroy} from "../redux/slices/PerfumeSlice.ts";
-import {allIngredients} from "../redux/slices/IngredientSlice.ts";
+import {allPerfumes, destroy, storingPerfume, updatePerfume} from "../redux/slices/PerfumeSlice.ts";
+import {allIngredients, destroyIngredient} from "../redux/slices/IngredientSlice.ts";
 import {allBrands, destroyBrand, storeBrand, updateBrand} from "../redux/slices/BrandSlice.ts";
 
 const Dashboard = () => {
@@ -34,6 +34,10 @@ const Dashboard = () => {
         dispatch(allBrands());
         dispatch(stats());
     };
+    const deleteIngredient = async (id: string) => {
+        await dispatch(destroyIngredient(id));
+        dispatch(allIngredients());
+    };
     const saveBrand = async (data) =>{
         await dispatch(storeBrand(data))
         dispatch(allBrands());
@@ -42,6 +46,15 @@ const Dashboard = () => {
     const modifyBrand = async (id,data) =>{
         await dispatch(updateBrand({id, data}))
         dispatch(allBrands());
+    }
+    const savePerfume = async (data) =>{
+        await dispatch(storingPerfume(data))
+        dispatch(allPerfumes());
+        dispatch(stats());
+    }
+    const modifyPerfume = async (id,data) =>{
+        await dispatch(updatePerfume({id, data}))
+        dispatch(allPerfumes());
     }
     useEffect(() => {
         dispatch(stats());
@@ -56,15 +69,9 @@ const Dashboard = () => {
     const perfumesCount = stat?.data?.length ? stat.data[0].perfumes : 0;
     const brandsCount = stat?.data?.length ? stat.data[0].brands : 0;
 
-    const prevData = { users: 1, perfumes: 1, brands: 1 };
-
-    const calculatePercentage = (current: number, previous: number) => {
-        if (previous === 0) return 100;
-        return Math.round(((current - previous) / previous) * 100);
-    };
-    if (!bestPerfumeState || bestPerfumeState.length === 0) {
-        return <p className="text-gray-400">No top-rated perfume found.</p>;
-    }
+    // if (!bestPerfumeState || bestPerfumeState.length === 0) {
+    //     return <p className="text-gray-400">No top-rated perfume found.</p>;
+    // }
 
     const sortedPerfumes = [...bestPerfumeState].sort((a, b) => b.averageRating - a.averageRating);
 
@@ -72,8 +79,7 @@ const Dashboard = () => {
     const otherBestPerfumes = sortedPerfumes.slice(1);
     return (
         <div className="flex h-screen bg-gray-950 text-white">
-            <Sidebar />
-            <div className="flex-1 ml-64 p-6 overflow-auto">
+            <div className="flex-1 p-6 overflow-auto">
                 <div className="mb-6 flex justify-between items-center">
                     <h1 className="text-2xl font-bold">Dashboard</h1>
                     <div className="relative">
@@ -90,19 +96,16 @@ const Dashboard = () => {
                     <MetricCard
                         title="Users"
                         value={usersCount}
-                        percentage={calculatePercentage(usersCount, prevData.users)}
                         color="#3b82f6"
                     />
                     <MetricCard
                         title="Perfumes"
                         value={perfumesCount}
-                        percentage={calculatePercentage(perfumesCount, prevData.perfumes)}
                         color="#3b82f6"
                     />
                     <MetricCard
                         title="Brands"
                         value={brandsCount}
-                        percentage={calculatePercentage(brandsCount, prevData.brands)}
                         color="#f59e0b"
                     />
                     <BestPerfumebyRating
@@ -116,23 +119,17 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                     <div className="lg:col-span-2">
-                        <PerfumeTable perfumes={perfumes} onDeletePerfume={deletePerfume} />
+                        <PerfumeTable updatePerfume={modifyPerfume} onSave={savePerfume} perfumes={perfumes} onDeletePerfume={deletePerfume} />
                     </div>
                     <ClientList clients={clients} />
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                     <div>
-                        <OrderList ingredients={notes}/>
+                        <OrderList ingredients={notes} onConfirm={deleteIngredient}/>
                     </div>
                     <div>
                         <ProductList updateBrand={modifyBrand} onDeleteBrand={deleteBrand} brandsData={brands} onSave={saveBrand}/>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                    <div>
-                        <PieChart />
                     </div>
                 </div>
             </div>

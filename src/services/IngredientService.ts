@@ -14,7 +14,7 @@ class IngredientService {
     }
 
     async delete(id: string){
-        const response = await this.http.delete(`/notes/destroy/${id}`)
+        const response = await this.http.delete(`/ingredients/${id}`)
         return response.data
     }
 

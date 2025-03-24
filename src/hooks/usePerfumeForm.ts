@@ -2,22 +2,23 @@ import { useState, ChangeEvent } from "react";
 
 interface PerfumeData {
     name: string;
-    image: string;
+    image: File | null;
     brand: string;
-    topNotes: string[]; // Array of selected ingredient names
+    topNotes: string[];
     middleNotes: string[];
     baseNotes: string[];
     TargetAudience: string;
     Volume: string;
     Concentration: string;
     sillage: string;
+    Barcode: string;
 }
 
 const usePerfumeForm = (initialData?: PerfumeData) => {
     const [perfumeData, setPerfumeData] = useState<PerfumeData>(
         initialData || {
             name: "",
-            image: "",
+            image: null,
             brand: "",
             topNotes: [],
             middleNotes: [],
@@ -26,36 +27,31 @@ const usePerfumeForm = (initialData?: PerfumeData) => {
             Volume: "",
             Concentration: "",
             sillage: "",
+            Barcode: "",
         }
     );
 
-    // Handle text/select input changes
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setPerfumeData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setPerfumeData((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Handle checkbox changes for notes
-    const handleNoteChange = (noteType: keyof Pick<PerfumeData, "topNotes" | "middleNotes" | "baseNotes">, ingredientName: string) => {
+    const handleNoteChange = (noteType: keyof Pick<PerfumeData, "topNotes" | "middleNotes" | "baseNotes">, ingredientId: string) => {
         setPerfumeData((prev) => {
             const currentNotes = prev[noteType];
-            if (currentNotes.includes(ingredientName)) {
-                // Remove if already selected
-                return { ...prev, [noteType]: currentNotes.filter((name) => name !== ingredientName) };
-            } else {
-                // Add if not selected
-                return { ...prev, [noteType]: [...currentNotes, ingredientName] };
-            }
+            return {
+                ...prev,
+                [noteType]: currentNotes.includes(ingredientId)
+                    ? currentNotes.filter((id) => id !== ingredientId)
+                    : [...currentNotes, ingredientId],
+            };
         });
     };
 
     const resetForm = () => {
         setPerfumeData({
             name: "",
-            image: "",
+            image: null,
             brand: "",
             topNotes: [],
             middleNotes: [],
@@ -64,6 +60,7 @@ const usePerfumeForm = (initialData?: PerfumeData) => {
             Volume: "",
             Concentration: "",
             sillage: "",
+            Barcode: "",
         });
     };
 

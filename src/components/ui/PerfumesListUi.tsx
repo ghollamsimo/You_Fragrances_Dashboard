@@ -2,18 +2,23 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 import DeleteModalComponent from "../DeleteModalComponent.tsx";
 import PerfumeModal from "../PerfumeModal.tsx";
+import PerfumeUpdateModalComponent from "../PerfumeUpdateModalComponent.tsx";
 
-const PerfumeTable = ({ perfumes , onDeletePerfume}) => {
+const PerfumeTable = ({updatePerfume, onSave, perfumes , onDeletePerfume}) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [storing, setStoring] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
     const [selectedPerfume, setSelectedPerfume] = useState(null);
     const handleDeleteClick = (perfume) => {
         setSelectedPerfume(perfume);
         setIsModalOpen(true);
     };
-
+    const handleUpdateClick = (perfume) => {
+        setSelectedPerfume(perfume);
+        setIsUpdateModalOpen(true);
+    };
     const confirmDelete = () => {
         if (selectedPerfume) {
             onDeletePerfume(selectedPerfume._id);
@@ -85,11 +90,16 @@ const PerfumeTable = ({ perfumes , onDeletePerfume}) => {
                                 <td className="p-3">{perfume.Concentration}</td>
                                 <td className="p-3">{perfume.sillage}</td>
                                 <td className="p-3">{perfume.averageRating}</td>
-                                <td className="p-3">
+                                <td className="p-3 flex gap-2 align-middle items-center">
                                     <button onClick={() => handleDeleteClick(perfume)}
                                             className="px-4 py-1 text-center rounded-lg bg-gray-800 flex items-center justify-center text-blue-400"
                                     >
                                         delete
+                                    </button>
+                                    <button onClick={() => handleUpdateClick(perfume)}
+                                            className="px-4 py-1 text-center rounded-lg bg-gray-800 flex items-center justify-center text-blue-400"
+                                    >
+                                        update
                                     </button>
                                 </td>
 
@@ -97,7 +107,7 @@ const PerfumeTable = ({ perfumes , onDeletePerfume}) => {
                         ))
                     ) : (
                         <tr>
-                        <td colSpan="7" className="text-center p-5 text-gray-400">
+                            <td colSpan="7" className="text-center p-5 text-gray-400">
                                 No perfumes found
                             </td>
                         </tr>
@@ -154,8 +164,11 @@ const PerfumeTable = ({ perfumes , onDeletePerfume}) => {
                 title="Delete Perfume"
                 message={`Are you sure you want to delete "${selectedPerfume?.name}"?`}
             />
-            {storing && <PerfumeModal onClose={() => setStoring(false)} onSave={undefined} setIsOpen={setStoring}
-                                      isOpen={storing} initialData={undefined} />}
+            {storing && <PerfumeModal onClose={() => setStoring(false)} onSave={onSave} setIsOpen={setStoring}
+                                      isOpen={storing}  />}
+            {isUpdateModalOpen && <PerfumeUpdateModalComponent onClose={() => setIsUpdateModalOpen(false)}
+                                                               onSave={updatePerfume} setIsOpen={setIsUpdateModalOpen}
+                                                               isOpen={isUpdateModalOpen} perfume={selectedPerfume}  />}
         </div>
     );
 };

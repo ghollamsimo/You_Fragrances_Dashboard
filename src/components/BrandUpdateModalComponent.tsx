@@ -63,7 +63,7 @@ const BrandUpdateModal = ({ onClose, onSave, setIsOpen, isOpen, brand }) => {
             formData.append("image", brandFields.imageFile);
         }
 
-        await onSave(brand._id, formData);  // Make sure brand._id is passed correctly
+        await onSave(brand._id, formData);
         onClose();
     };
 

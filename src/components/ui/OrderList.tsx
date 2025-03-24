@@ -4,13 +4,21 @@ import { Ingredient, OrderListProps } from "../../constant.ts";
 import { useDispatch } from "react-redux";
 import { addMultipleIngredients } from "../../redux/slices/IngredientSlice.ts";
 import { AppDispatch } from "../../redux/Store.ts";
+import DeleteModalComponent from "../DeleteModalComponent.tsx";
 
-const OrderList = ({ ingredients }: OrderListProps) => {
+const OrderList = ({ ingredients, onConfirm}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newIngredients, setNewIngredients] = useState<Partial<Ingredient>[]>([
         { name: "", color: "", width: "", image: "", type: "" }
     ]);
+    const [selectedIngredient, setSelectedIngredient] = useState(null);
+    const [deleteState, setDeleteState] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
+    const totalPages = Math.ceil(ingredients.length / itemsPerPage);
+    const displayedIngredients = ingredients.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -25,6 +33,18 @@ const OrderList = ({ ingredients }: OrderListProps) => {
         const updatedIngredients = [...newIngredients];
         updatedIngredients[index] = { ...updatedIngredients[index], [field]: value };
         setNewIngredients(updatedIngredients);
+    };
+
+    const handleDeleteClick = (ingredient) => {
+        setSelectedIngredient(ingredient);
+        setDeleteState(true);
+    };
+
+    const confirmDelete = () => {
+        if (selectedIngredient) {
+            onConfirm(selectedIngredient._id);
+        }
+        setIsModalOpen(false);
     };
 
     const handleFileChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,25 +111,59 @@ const OrderList = ({ ingredients }: OrderListProps) => {
                 </tr>
                 </thead>
                 <tbody>
-                {ingredients?.map((ingredient) => (
+                {displayedIngredients.map((ingredient) => (
                     <tr key={ingredient._id} className="text-white">
-                        <td className="p-3 capitalize">{ingredient.type_note}</td>
+                        <td className="p-3 capitalize">{ingredient.type}</td>
                         <td className="p-3">{ingredient.name}</td>
                         <td className="p-3">
                             <img className="w-14 h-14" src={ingredient.image} alt={ingredient.name} />
                         </td>
                         <td className="p-3">
-                            <button
-                                onClick={() => openModal()}
-                                className="text-blue-400 underline hover:text-blue-300 text-sm"
+                            <button onClick={() => handleDeleteClick(ingredient)}
+                                    className="px-4 py-1 text-center rounded-lg bg-gray-800 flex items-center justify-center text-blue-400"
                             >
-                                Show Details
+                                delete
                             </button>
                         </td>
                     </tr>
                 ))}
                 </tbody>
             </table>
+
+            {totalPages > 1 && (
+                <nav className="mt-5 flex justify-end">
+                    <ul className="inline-flex -space-x-px text-sm">
+                        <li>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className={`px-3 h-8 rounded-s-lg ${currentPage === 1 ? "text-gray-400 bg-gray-700 cursor-not-allowed" : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700"}`}
+                            >
+                                Previous
+                            </button>
+                        </li>
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <li key={index}>
+                                <button
+                                    onClick={() => setCurrentPage(index + 1)}
+                                    className={`px-3 h-8 ${currentPage === index + 1 ? "bg-blue-50 hover:bg-blue-100 text-blue-700" : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700"}`}
+                                >
+                                    {index + 1}
+                                </button>
+                            </li>
+                        ))}
+                        <li>
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className={`px-3 h-8 rounded-e-lg ${currentPage === totalPages ? "text-gray-400 bg-gray-700 cursor-not-allowed" : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700"}`}
+                            >
+                                Next
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            )}
 
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -178,6 +232,8 @@ const OrderList = ({ ingredients }: OrderListProps) => {
                     </div>
                 </div>
             )}
+
+            {selectedIngredient && <DeleteModalComponent isOpen={deleteState} onClose={() => setDeleteState(false)} onConfirm={confirmDelete} title={'Delete Ingredient'} message={`Are you sure you want to delete "${selectedIngredient?.name}"?`}/>}
         </div>
     );
 };
